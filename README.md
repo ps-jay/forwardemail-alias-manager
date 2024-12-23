@@ -13,6 +13,17 @@ TBA
 
 ## Inputs
 
+<!-- AUTO-DOC-INPUT:START - Do not remove or modify this section -->
+
+|                             INPUT                              |  TYPE  | REQUIRED |  DEFAULT  |                                DESCRIPTION                                 |
+|----------------------------------------------------------------|--------|----------|-----------|----------------------------------------------------------------------------|
+| <a name="input_alias_file"></a>[alias_file](#input_alias_file) | string |   true   |           |                 The YAML file that defines all the aliases                 |
+|     <a name="input_api_key"></a>[api_key](#input_api_key)      | string |   true   |           |              The API key for forwardemail.net authentication               |
+|          <a name="input_diff"></a>[diff](#input_diff)          | string |  false   | `"false"` | Don't make changes, show diff between forwardemail.net and alias YAML file |
+|       <a name="input_domain"></a>[domain](#input_domain)       | string |   true   |           |                         The domain name to manage                          |
+
+<!-- AUTO-DOC-INPUT:END -->
+
 
 
 ## Limitations
