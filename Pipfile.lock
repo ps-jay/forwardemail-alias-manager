@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "93ec3556f40ed120225059c1e902d3fd1e4ff1ff8839b93ba40666d7a2c96ffd"
+            "sha256": "7ab7cf9181093bc8c3b7de41545f7947f025e0fe3e876dee622835955707ff43"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_version": "3.13"
+            "python_version": "3.12"
         },
         "sources": [
             {
@@ -224,11 +224,11 @@
     "develop": {
         "astroid": {
             "hashes": [
-                "sha256:29fe1df7ef64dc17a54dbfad67b40b445340fcdba7c4012e7ecc9270c9b2f5b6",
-                "sha256:e1ea2c358a3c760ef583d4963e773100fa2c693b27ed158a1d0e81adb4436903"
+                "sha256:6aaea045f938c735ead292204afdb977a36e989522b7833ef6fea94de743f442",
+                "sha256:db676dc4f3ae6bfe31cda227dc60e03438378d7a896aec57422c95634e8d722f"
             ],
             "markers": "python_full_version >= '3.9.0'",
-            "version": "==3.3.7"
+            "version": "==3.3.6"
         },
         "dill": {
             "hashes": [

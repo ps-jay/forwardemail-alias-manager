@@ -28,7 +28,7 @@ runs:
       name: Set up Python
       uses: actions/setup-python@v1
       with:
-        python-version: 3.13  # match Pipfile
+        python-version: 3.12  # match Pipfile
 
     - id: pipenv
       name: Install pipenv
@@ -39,21 +39,23 @@ runs:
       name: Install dependencies
       shell: bash
       run: |
-        set -euo pipefile
+        set -euo pipefail
 
+        export PIPENV_PIPFILE="${{ github.action_path }}/Pipfile"
         pipenv install
 
     - id: run
       name: Run forwardemail-alias-manager
       shell: bash
       run: |
-        set -euo pipefile
+        set -euo pipefail
 
         DIFF_FLAG=""
         if [[ "${{ inputs.diff }}" == "true" ]] ; then
           DIFF_FLAG="--diff"
         fi
 
+        export PIPENV_PIPFILE="${{ github.action_path }}/Pipfile"
         pipenv run "${{ github.action_path }}/src/main.py" \
           "${{ inputs.domain }}" \
           "${{ inputs.api_key }}" \
