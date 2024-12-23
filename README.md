@@ -11,6 +11,10 @@ Then setup a workflow like this:
 TBA
 ```
 
+## Inputs
+
+
+
 ## Limitations
 This is coded to what I need, and therefore doesn't support all of the
 possibilities of forwardemail.net
