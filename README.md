@@ -57,7 +57,6 @@ The domain YAML for multiple alias domain looks like this:
 <!-- AUTO-DOC-INPUT:END -->
 
 
-
 ## Limitations
 This is coded to what I need, and therefore doesn't support all of the
 possibilities of forwardemail.net
@@ -67,3 +66,89 @@ default email for the domain.  So I use nobody@forwardemail.net
 
 Probably all this should be Terraform instead, but this was the quickest
 path from zero to success for me
+
+
+##  Full example workflow for YAML storing repo
+
+```yaml
+---
+name: Make aliases as intended
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+
+jobs:
+  files:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.show.outputs.domains }}
+    steps:
+      - id: checkout
+        name: Checkout code 🛒
+        uses: actions/checkout@v4
+
+      - id: glob
+        name: Glob match
+        uses: tj-actions/glob@v22
+        with:
+          files: |
+            *.yaml
+
+      - id: show
+        name: Show found and strip YAML
+        shell: bash
+        run: |
+         set -euo pipefail
+         echo "${{ steps.glob.outputs.paths }}"
+         export paths="${{ steps.glob.outputs.paths }}"
+         echo "domains=$(jq -cR 'split(" ")' <<< "${paths//.yaml}")" | tee -a "${GITHUB_OUTPUT}"
+
+  diff:
+    if: ${{ github.ref_name != github.event.repository.default_branch }}
+    runs-on: ubuntu-latest
+    needs: [files]
+    strategy:
+      matrix: 
+        domains: ${{ fromJSON(needs.files.outputs.matrix) }}
+      max-parallel: 5
+      fail-fast: false
+    steps:
+      - id: checkout
+        name: Checkout code 🛒
+        uses: actions/checkout@v4
+
+      - id: diff
+        name: Show diff
+        uses: ps-jay/forwardemail-alias-manager@2024.12.1
+        with:
+          domain: "${{ matrix.domains }}"
+          api_key: "${{ secrets.api_key }}"
+          alias_file: "${{ matrix.domains }}.yaml"
+          diff: true
+
+  run:
+    if: ${{ github.ref_name == github.event.repository.default_branch }}
+    runs-on: ubuntu-latest
+    needs: [files]
+    strategy:
+      matrix: 
+        domains: ${{ fromJSON(needs.files.outputs.matrix) }}
+      max-parallel: 5
+      fail-fast: false
+    steps:
+      - id: checkout
+        name: Checkout code 🛒
+        uses: actions/checkout@v4
+
+      - id: run
+        name: Make it so
+        uses: ps-jay/forwardemail-alias-manager@2024.12.1
+        with:
+          domain: "${{ matrix.domains }}"
+          api_key: "${{ secrets.api_key }}"
+          alias_file: "${{ matrix.domains }}.yaml"
+```
