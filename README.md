@@ -8,7 +8,13 @@ Have a private (presumably!) repo with YAML files for each domain
 
 Then setup a workflow like this:
 ```yaml
-TBA
+      - id: run
+        name: Make it so
+        uses: ps-jay/forwardemail-alias-manager@2024.12.1
+        with:
+          domain: example.net
+          api_key: "${{ secrets.api_key }}"
+          alias_file: example.net.yaml
 ```
 
 ## Inputs

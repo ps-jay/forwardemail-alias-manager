@@ -192,8 +192,10 @@ def update(domain, api_key, names, current, data):
             'max_quota': desired_details['max_quota'],
         }
 
-        pprint.pprint(current_details)
-        pprint.pprint(desired_details)
+        diff = {}
+        for detail in current_details:
+            if current_details[detail] != desired_details[detail]:
+                diff[detail] = f"{current_details[detail]} -> {desired_details[detail]}"
 
         request = session.put(f"https://api.forwardemail.net/v1/domains/{domain}/aliases/{alias_id}",
             auth=auth,
@@ -203,9 +205,7 @@ def update(domain, api_key, names, current, data):
 
         if request.status_code != 200:
             raise RuntimeError(f"HTTP Error {request.status_code} on creating {name}:\n{request.text}")
-        print(f"Updated {name}")
-        print(request.text)
-        print()
+        print(f"Updated {name} for differences: {diff}")
 
     print()
 
