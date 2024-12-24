@@ -1,0 +1,63 @@
+---
+name: 'Manage aliases on forwardemail.net'
+description: |
+  This action takes YAML input file and manage aliases on forwardemail.net
+
+branding:
+  icon: package
+  color: purple
+
+inputs:
+  domain:
+    description: The domain name to manage
+    required: true
+  api_key:
+    description: The API key for forwardemail.net authentication
+    required: true
+  alias_file:
+    description: The YAML file that defines all the aliases
+    required: true
+  diff:
+    description: Don't make changes, show diff between forwardemail.net and alias YAML file
+    default: false
+
+runs:
+  using: "composite"
+  steps:
+    - id: python
+      name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.12  # match Pipfile
+
+    - id: pipenv
+      name: Install pipenv
+      shell: bash
+      run: pip install -U pip pipenv
+
+    - id: install
+      name: Install dependencies
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        export PIPENV_PIPFILE="${{ github.action_path }}/Pipfile"
+        pipenv install
+
+    - id: run
+      name: Run forwardemail-alias-manager
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        DIFF_FLAG=""
+        if [[ "${{ inputs.diff }}" == "true" ]] ; then
+          DIFF_FLAG="--diff"
+        fi
+
+        export PIPENV_PIPFILE="${{ github.action_path }}/Pipfile"
+        pipenv run "${{ github.action_path }}/src/main.py" \
+          "${{ inputs.domain }}" \
+          "${{ inputs.api_key }}" \
+          "${{ inputs.alias_file }}" \
+          ${DIFF_FLAG:-}

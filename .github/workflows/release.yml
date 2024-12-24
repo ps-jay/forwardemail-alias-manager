@@ -1,0 +1,65 @@
+---
+name: Test and Release
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
+
+jobs:
+  update-doc:
+    if: ${{ github.ref_name != github.event.repository.default_branch }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout code 🛒
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # otherwise, you will failed to push refs to dest repo
+
+      - id: auto-doc
+        name: Run auto-doc 📃
+        uses: tj-actions/auto-doc@v3
+        with:
+          col_max_width: '2048'
+          col_max_words: '15'
+
+      - id: changes
+        name: Verify changed files 🔎
+        uses: tj-actions/verify-changed-files@v20
+        with:
+          files: |
+            README.md
+
+      - id: commit
+        if: steps.changes.outputs.files_changed == 'true'
+        name: Commit README changes 📥
+        uses: EndBug/add-and-commit@v9
+        with:
+          message: 'Update README'
+          committer_name: 'GitHub Actions'
+          committer_email: 'actions@github.com'
+          add: 'README.md'
+
+  release:
+    if: ${{ github.ref_name == github.event.repository.default_branch }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        name: Checkout code 🛒
+        uses: actions/checkout@v4
+
+      - id: version
+        name: Calculate next version 🔢
+        uses: reecetech/version-increment@2024.10.1
+        with:
+          scheme: calver
+
+      - name: Release version
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: false
+          tag_name: "${{ steps.version.outputs.version }}"
