@@ -17,6 +17,32 @@ Then setup a workflow like this:
           alias_file: example.net.yaml
 ```
 
+The domain YAML for a catch-all domain looks like this:
+```yaml
+---
+- name: "*"  # catch-all
+  recipients: ["my.real.email@example.com"]
+
+- name: do-not-deliver
+  is_enabled: false
+```
+
+The domain YAML for multiple alias domain looks like this:
+```yaml
+---
+# Alice
+- name: alice
+  recipients: ["alice@example.com"]
+
+# Bob
+- name: bob
+  recipients: ["bob@example.com"]
+
+# Joint delivery
+- name: aandb
+  recipients: ["alice@example.com", "bob@example.com"]
+```
+
 ## Inputs
 
 <!-- AUTO-DOC-INPUT:START - Do not remove or modify this section -->
