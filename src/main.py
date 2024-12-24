@@ -36,23 +36,37 @@ def parse_args():
 
 def get_current(domain, api_key):
     """Get current aliases for the domain"""
+    data = []
+    page = 1
+    more_pages = True
+    session = requests.Session()
     auth = requests.auth.HTTPBasicAuth(api_key, '')
-    params = {'pagination': 'true'}
-    request = requests.get(f"https://api.forwardemail.net/v1/domains/{domain}/aliases",
-        auth=auth,
-        params=params,
-        timeout=10,
-    )
 
-    if request.status_code != 200:
-        raise RuntimeError(f"HTTP Error {request.status_code} on get aliases:\n{request.text}")
+    while more_pages:
+        params = {
+            'pagination': 'true',
+            'page': page,
+        }
+        request = requests.get(f"https://api.forwardemail.net/v1/domains/{domain}/aliases",
+            auth=auth,
+            params=params,
+            timeout=10,
+        )
 
-    if not request.headers.get('X-Page-Count'):
-        raise RuntimeError("HTTP X-Page-Count not returned")
-    if request.headers['X-Page-Count'] != "1":
-        raise RuntimeError(f"HTTP Page Count not 1 (is {request.headers['X-Page-Count']})")
+        if request.status_code != 200:
+            raise RuntimeError(f"HTTP Error {request.status_code} on get aliases:\n{request.text}")
 
-    return request.json()
+        if not request.headers.get('X-Page-Count'):
+            raise RuntimeError("HTTP X-Page-Count not returned")
+
+        if int(request.headers['X-Page-Count']) > page:
+            page += 1
+        else:
+            more_pages = False
+
+        data += request.json()
+
+    return data
 
 
 def filter_fields(data):
